@@ -6,7 +6,7 @@
 {-# OPTIONS_GHC -Werror #-}                        -- turn warnings into errors
 {-# LANGUAGE InstanceSigs #-}
 module Parser where
-import GHC.Base (Alternative(..))
+import GHC.Base (Alternative(..), Applicative(liftA2))
 
 -- Взето от: https://github.com/fmi-fp-lab/fp-lab-2024-25/blob/master/exercises/09/Parser.hs
 -- START
