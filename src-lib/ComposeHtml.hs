@@ -116,6 +116,9 @@ transformHtml [Inline t] = "<code>" ++ t ++ "</code>"
 transformHtml [Paragraph p] = "<p>" ++ concatMap (transformHtml.(:[])) p ++ "</p>\n"
 transformHtml [Header p] = "<h1>" ++ concatMap (transformHtml.(:[])) p ++ "</h1>\n"
 transformHtml [Header2 p] = "<h2>" ++ concatMap (transformHtml.(:[])) p ++ "</h2>\n"
+transformHtml [Header3 p] = "<h3>" ++ concatMap (transformHtml.(:[])) p ++ "</h3>\n"
+transformHtml [Header4 p] = "<h4>" ++ concatMap (transformHtml.(:[])) p ++ "</h4>\n"
+transformHtml [Header5 p] = "<h5>" ++ concatMap (transformHtml.(:[])) p ++ "</h5>\n"
 transformHtml res@((Blockquote _): _) =
      "<blockquote>\n" ++ concatMap (
         \val -> case val of 

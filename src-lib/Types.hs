@@ -13,6 +13,9 @@ data TextInformation =
     | Italic TextInformation
     | Header [TextInformation]
     | Header2 [TextInformation]
+    | Header3 [TextInformation]
+    | Header4 [TextInformation]
+    | Header5 [TextInformation]
     | Link String String
     | Image String String
     | Blockquote [TextInformation]

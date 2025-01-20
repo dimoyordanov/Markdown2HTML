@@ -71,6 +71,12 @@ spec = do
             (transformHtml2 [Header [Text "123"]]) `shouldBe` "<h1>123</h1>\n"
         it "Compose header2" $ do
             (transformHtml2 [Header2 [Text "123"]]) `shouldBe` "<h2>123</h2>\n"
+        it "Compose header3" $ do
+            (transformHtml2 [Header3 [Text "123"]]) `shouldBe` "<h3>123</h3>\n"
+        it "Compose header4" $ do
+            (transformHtml2 [Header4 [Text "123"]]) `shouldBe` "<h4>123</h4>\n"
+        it "Compose header5" $ do
+            (transformHtml2 [Header5 [Text "123"]]) `shouldBe` "<h5>123</h5>\n"
         it "Compose header2 complex" $ do
             (transformHtml2 [Header2 [Bold $ Text $ "123", Text $ "321"]]) `shouldBe` "<h2><b>123</b>321</h2>\n"
         it "Compose header2 none" $ do

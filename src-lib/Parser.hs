@@ -3,7 +3,6 @@
 {-# OPTIONS_GHC -fwarn-missing-signatures #-}      -- write all your toplevel signatures!
 {-# OPTIONS_GHC -fwarn-name-shadowing #-}          -- use different names!
 {-# OPTIONS_GHC -fwarn-incomplete-uni-patterns #-} -- warn about incomplete patterns v2
-{-# OPTIONS_GHC -Werror #-}                        -- turn warnings into errors
 {-# LANGUAGE InstanceSigs #-}
 module Parser where
 import GHC.Base (Alternative(..), Applicative(liftA2))

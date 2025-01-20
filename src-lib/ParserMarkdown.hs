@@ -61,6 +61,15 @@ parseHeader1 = fmap Header  $ matchesString "# " >> parseText
 parseHeader2 :: Parser TextInformation
 parseHeader2 = fmap Header2  $ matchesString "## " >> parseText
 
+parseHeader3 :: Parser TextInformation
+parseHeader3 = fmap Header3  $ matchesString "### " >> parseText
+
+parseHeader4 :: Parser TextInformation
+parseHeader4 = fmap Header4  $ matchesString "#### " >> parseText
+
+parseHeader5 :: Parser TextInformation
+parseHeader5 = fmap Header5  $ matchesString "##### " >> parseText
+
 parseBlockquote :: Parser TextInformation
 parseBlockquote = fmap Blockquote  $ matchesString "> " >> parseText
 
@@ -74,4 +83,13 @@ parseRule :: Parser TextInformation
 parseRule = eatPredicate (=='-') >> eatPredicate (=='-') >> eatPredicate (=='-') >> some (eatPredicate (=='-')) $> Rule
 
 parseLine :: Parser TextInformation
-parseLine = parseRule <|> parseHeader1 <|> parseHeader2 <|> parseBlockquote <|> parseUnordered <|> parseOrdered <|> fmap Paragraph parseText
+parseLine = parseRule <|>
+ parseHeader1 <|>
+  parseHeader2 <|>
+   parseHeader3 <|>
+    parseHeader4 <|>
+     parseHeader5 <|>
+      parseBlockquote <|>
+       parseUnordered <|>
+        parseOrdered <|> 
+        fmap Paragraph parseText
