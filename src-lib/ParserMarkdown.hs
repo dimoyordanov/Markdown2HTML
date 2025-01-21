@@ -34,7 +34,28 @@ matchesString (x: xs) = do
     return $ val: res
 
 string :: Parser String
-string = some $ eatPredicate isLetter <|> eatPredicate (==' ') <|> eatPredicate (=='/') <|> eatPredicate (==':') <|> eatPredicate (=='.') <|> eatPredicate (=='-') <|> eatPredicate isDigit
+string = do
+  some $ eatPredicate isLetter <|>
+                eatPredicate (==' ') <|> 
+                eatPredicate (=='/') <|> 
+                eatPredicate (==':') <|> 
+                eatPredicate (=='?') <|>
+                eatPredicate (=='&') <|> 
+                eatPredicate (==';') <|> 
+                eatPredicate (=='=') <|> 
+                eatPredicate (=='(') <|> 
+                eatPredicate (==')') <|> 
+                eatPredicate (==',') <|> 
+                eatPredicate (=='+') <|> 
+                eatPredicate (=='>') <|> 
+                eatPredicate (=='<') <|> 
+                eatPredicate (=='|') <|> 
+                eatPredicate (=='\'') <|> 
+                eatPredicate (=='\"') <|> 
+                eatPredicate (=='\\') <|> 
+                eatPredicate (=='.') <|> 
+                eatPredicate (=='-') <|> 
+                eatPredicate isDigit
 
 number :: Parser String
 number = some $ eatPredicate isDigit
