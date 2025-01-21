@@ -114,7 +114,7 @@ parseCheckBox :: Parser TextInformation
 parseCheckBox = fmap Checkbox $ (matchesString "- [] " >> parseText)
 
 parseRule :: Parser TextInformation
-parseRule = eatPredicate (=='-') >> eatPredicate (=='-') >> eatPredicate (=='-') >> some (eatPredicate (=='-')) $> Rule
+parseRule = eatPredicate (=='-') >> eatPredicate (=='-') >> eatPredicate (=='-') >> many (eatPredicate (=='-')) $> Rule
 
 parseLine :: Parser TextInformation
 parseLine = parseRule <|>

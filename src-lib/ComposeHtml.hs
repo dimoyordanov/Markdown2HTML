@@ -42,7 +42,7 @@ generatedCss = "<link href=\"https://fonts.googleapis.com/css2?family=Roboto:wgh
 \        } \
 \        hr { \
 \            border: 0; \
-\            border-top: 1px solid #eee; \
+\            border-top: 1.5px solid #eee; \
 \            margin: 40px 0; \
 \        } \
 \        code { \
