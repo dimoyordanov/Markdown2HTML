@@ -11,6 +11,7 @@ data TextInformation =
     | Paragraph [TextInformation]
     | Bold TextInformation
     | Italic TextInformation
+    | StrikeThrough TextInformation
     | Header [TextInformation]
     | Header2 [TextInformation]
     | Header3 [TextInformation]
@@ -21,6 +22,7 @@ data TextInformation =
     | Blockquote [TextInformation]
     | NonOrderedList [TextInformation]
     | OrderedList [TextInformation]
+    | Checkbox [TextInformation]
     | Rule
     | Inline String
     deriving (Show, Eq)

@@ -82,7 +82,7 @@ putInplaceHtml arg= "<!DOCTYPE html>\n" ++
                     "</html>\n"
 
 transformHtmlList:: [TextInformation] -> String
-transformHtmlList l = putInplaceHtml $ transformHtml2 l
+transformHtmlList l = putInplaceHtml $ transformHtml2 $ filter (/=(Paragraph []))l
 
 transformHtml2 :: [TextInformation] -> String
 transformHtml2 [] = ""
@@ -104,6 +104,12 @@ transformHtml2 res@((OrderedList _): _) = transformHtml (takeWhile func res) ++ 
                                                 func = \str -> case str of
                                                             (OrderedList _) -> True
                                                             _ -> False
+transformHtml2 res@((Checkbox _): _) = transformHtml (takeWhile func res) ++ transformHtml2 (dropWhile func res)
+                                            where
+                                                func :: TextInformation -> Bool
+                                                func = \str -> case str of
+                                                            (Checkbox _) -> True
+                                                            _ -> False
 transformHtml2 (x : xs) = transformHtml [x] ++ transformHtml2 xs
 
 transformHtml:: [TextInformation] -> String
@@ -113,6 +119,9 @@ transformHtml [Text l] = l
 transformHtml [Italic t] = "<i>" ++ transformHtml [t] ++ "</i>"
 transformHtml [Bold t] = "<b>" ++ transformHtml [t] ++ "</b>"
 transformHtml [Inline t] = "<code>" ++ t ++ "</code>"
+transformHtml [StrikeThrough t] = "<s>" ++ transformHtml [t] ++ "</s>"
+transformHtml [Link a b] = "<a href = \"" ++ b ++ "\">" ++ a ++ "</a>"
+transformHtml [Image a b] = "<img src = \"" ++ b ++ "\" alt = \""++a++"\"></img>"
 transformHtml [Paragraph p] = "<p>" ++ concatMap (transformHtml.(:[])) p ++ "</p>\n"
 transformHtml [Header p] = "<h1>" ++ concatMap (transformHtml.(:[])) p ++ "</h1>\n"
 transformHtml [Header2 p] = "<h2>" ++ concatMap (transformHtml.(:[])) p ++ "</h2>\n"
@@ -137,5 +146,10 @@ transformHtml res@((OrderedList _): _) =
                     (OrderedList l1) -> "<li>"++concatMap (transformHtml.(:[])) l1 ++ "</li>\n"
                     l -> show l
         ) res ++ "</ol>\n"
-
+transformHtml res@((Checkbox _): _) =
+     concatMap (
+        \val -> case val of
+                    (Checkbox l1) -> "<div>\n<input type=\"checkbox\" id=\"scales\" name=\"scales\">\n<label for=\"scales\">"++concatMap (transformHtml.(:[])) l1 ++ "</label>\n</div>\n"
+                    l -> show l
+        ) res
 transformHtml _ = error "error parsing"

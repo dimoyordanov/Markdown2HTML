@@ -34,7 +34,7 @@ matchesString (x: xs) = do
     return $ val: res
 
 string :: Parser String
-string = some $ eatPredicate isLetter <|> eatPredicate (==' ') <|> eatPredicate isDigit
+string = some $ eatPredicate isLetter <|> eatPredicate (==' ') <|> eatPredicate (=='/') <|> eatPredicate (==':') <|> eatPredicate (=='.') <|> eatPredicate (=='-') <|> eatPredicate isDigit
 
 number :: Parser String
 number = some $ eatPredicate isDigit
@@ -42,9 +42,33 @@ number = some $ eatPredicate isDigit
 parserBold :: Parser TextInformation
 parserBold = fmap ((Bold).Text)  $ (matchesString "**" >> string <* matchesString "**") <|> (matchesString "__" >> string <* matchesString "__" )
 
+parserBoldAndItalic :: Parser TextInformation
+parserBoldAndItalic = fmap ((Bold).(Italic).Text)  $ (matchesString "***" >> string <* matchesString "***") <|> (matchesString "___" >> string <* matchesString "___" )
+
+
+parserStrikeThrough :: Parser TextInformation
+parserStrikeThrough = fmap ((StrikeThrough).Text)  $ (matchesString "~~" >> string <* matchesString "~~")
+
 parserInline :: Parser TextInformation
 parserInline = fmap Inline  $ matchesString "`" >> some (eatPredicate (/='`')) <* matchesString "`"
 
+parserImage :: Parser TextInformation
+parserImage = do
+  _ <- matchesString "!["
+  name <- string
+  _ <- matchesString "]("
+  link <- string
+  _ <- matchesString ")"
+  return $ Image name link
+
+parserLink :: Parser TextInformation
+parserLink = do
+  _ <- matchesString "["
+  name <- string
+  _ <- matchesString "]("
+  link <- string
+  _ <- matchesString ")"
+  return $ Link name link
 
 parserItalic :: Parser TextInformation
 parserItalic = fmap ((Italic).Text)  $ (matchesString "*" >> string <* matchesString "*" ) <|> (matchesString "_" >> string <* matchesString "_" )
@@ -53,7 +77,14 @@ parserText :: Parser TextInformation
 parserText = Text <$> string
 
 parseText :: Parser [TextInformation]
-parseText = many $ parserBold <|> parserItalic <|> parserText <|> parserInline
+parseText = many $ parserImage <|>
+                   parserLink <|> 
+                   parserBoldAndItalic <|> 
+                   parserStrikeThrough <|>
+                   parserBold <|> 
+                   parserItalic <|> 
+                   parserInline <|> 
+                   parserText
 
 parseHeader1 :: Parser TextInformation
 parseHeader1 = fmap Header  $ matchesString "# " >> parseText
@@ -79,6 +110,9 @@ parseUnordered = fmap NonOrderedList $ (matchesString "* " >> parseText) <|> (ma
 parseOrdered :: Parser TextInformation
 parseOrdered = fmap OrderedList $ (number >> matchesString ". " >> parseText) <|> (number >> matchesString ") " >> parseText)
 
+parseCheckBox :: Parser TextInformation
+parseCheckBox = fmap Checkbox $ (matchesString "- [] " >> parseText)
+
 parseRule :: Parser TextInformation
 parseRule = eatPredicate (=='-') >> eatPredicate (=='-') >> eatPredicate (=='-') >> some (eatPredicate (=='-')) $> Rule
 
@@ -90,6 +124,9 @@ parseLine = parseRule <|>
     parseHeader4 <|>
      parseHeader5 <|>
       parseBlockquote <|>
+       parseCheckBox <|>
        parseUnordered <|>
         parseOrdered <|> 
+        parserLink <|>
+        parserImage <|>
         fmap Paragraph parseText

@@ -21,6 +21,16 @@ spec = do
             (parse parseLine "_3_") `shouldBe` Just (Paragraph [Italic (Text "3")])
         it "ParseLine bold2 none" $ do
             (parse parseLine "____") `shouldBe` Just (Paragraph [])
+        it "ParseLine link" $ do
+            (parse parseLine "aba [Hello](google.com)") `shouldBe` Just (Paragraph [Text "aba ",Link "Hello" "google.com"])
+        it "ParseLine link" $ do
+            (parse parseLine "aba ![Hello](google.com)") `shouldBe` Just (Paragraph [Text "aba ",Image "Hello" "google.com"])
+        it "ParseLine link" $ do
+            (parse parseLine "[Hello](google.com)") `shouldBe` Just (Link "Hello" "google.com")
+        it "parseLink link2" $ do
+            (parse parseLine "![Markdown Logo](https://markdown-here.com/img/icon256.png)") `shouldBe`  Just (Image "Markdown Logo" "https://markdown-here.com/img/icon256.png")
+        it "ParseLine link" $ do
+            (parse parseLine "![Hello](google.com)") `shouldBe` Just (Image "Hello" "google.com")
         it "ParseLine italic2 nono" $ do
             (parse parseLine "__") `shouldBe` Just (Paragraph [])
         it "ParseLine inline" $ do
@@ -49,6 +59,8 @@ spec = do
             (parse parseLine "1. __il__") `shouldBe` Just (OrderedList [Bold $ Text "il"])
         it "ParseLine Ordered list3++" $ do
             (parse parseLine "1) mil __il__ vil") `shouldBe` Just (OrderedList [Text "mil ", Bold $ Text "il", Text " vil"])
+        it "ParseLine checkbox" $ do
+            (parse parseLine "- [] mil") `shouldBe` Just (Checkbox [Text "mil"])
         it "ParseLine line" $ do
             (parse parseLine "----") `shouldBe` Just (Rule)
     
@@ -63,6 +75,12 @@ spec = do
             (transformHtml2 [Italic $ Text "Bazinga"]) `shouldBe` "<i>Bazinga</i>"
         it "Compose bold" $ do
             (transformHtml2 [Bold $ Text "Bazinga"]) `shouldBe` "<b>Bazinga</b>"
+        it "Compose bold" $ do
+            (transformHtml2 [StrikeThrough $ Text "Bazinga"]) `shouldBe` "<s>Bazinga</s>"
+        it "Compose link" $ do
+            (transformHtml2 [Link "aba" "baba"]) `shouldBe` "<a href = \"baba\">aba</a>"
+        it "Compose image" $ do
+            (transformHtml2 [Image "aba" "baba"]) `shouldBe` "<img src = \"baba\" alt = \"aba\"></img>"
         it "Compose inline" $ do
             (transformHtml2 [Inline $ "Bazinga"]) `shouldBe` "<code>Bazinga</code>"
         it "Compose paragraph" $ do
