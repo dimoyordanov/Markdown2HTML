@@ -44,7 +44,8 @@ string = do
                 eatPredicate (==';') <|> 
                 eatPredicate (=='=') <|> 
                 eatPredicate (=='(') <|> 
-                eatPredicate (==')') <|> 
+                eatPredicate (==')') <|>
+                eatPredicate (=='^') <|> 
                 eatPredicate (==',') <|> 
                 eatPredicate (=='+') <|> 
                 eatPredicate (=='>') <|> 
@@ -71,7 +72,11 @@ parserStrikeThrough :: Parser TextInformation
 parserStrikeThrough = fmap ((StrikeThrough).Text)  $ (matchesString "~~" >> string <* matchesString "~~")
 
 parserInline :: Parser TextInformation
-parserInline = fmap Inline  $ matchesString "`" >> some (eatPredicate (/='`')) <* matchesString "`"
+parserInline = fmap Inline  $ matchesString "`" >> some (eatPredicate (\x ->(x/='`') && (x/='\n'))) <* matchesString "`"
+
+parserMathJax :: Parser TextInformation
+parserMathJax = fmap Math  $ matchesString "$" >> some (eatPredicate (\x -> (x/='$') && (x/='\n'))) <* matchesString "$"
+
 
 parserImage :: Parser TextInformation
 parserImage = do
@@ -105,6 +110,7 @@ parseText = many $ parserImage <|>
                    parserBold <|> 
                    parserItalic <|> 
                    parserInline <|> 
+                   parserMathJax <|>
                    parserText
 
 parseHeader1 :: Parser TextInformation
@@ -139,15 +145,15 @@ parseRule = eatPredicate (=='-') >> eatPredicate (=='-') >> eatPredicate (=='-')
 
 parseLine :: Parser TextInformation
 parseLine = parseRule <|>
- parseHeader1 <|>
+  parseHeader1 <|>
   parseHeader2 <|>
-   parseHeader3 <|>
-    parseHeader4 <|>
-     parseHeader5 <|>
-      parseBlockquote <|>
-       parseCheckBox <|>
-       parseUnordered <|>
-        parseOrdered <|> 
-        parserLink <|>
-        parserImage <|>
-        fmap Paragraph parseText
+  parseHeader3 <|>
+  parseHeader4 <|>
+  parseHeader5 <|>
+  parseBlockquote <|>
+  parseCheckBox <|>
+  parseUnordered <|>
+  parseOrdered <|> 
+  parserLink <|>
+  parserImage <|>
+  fmap Paragraph parseText

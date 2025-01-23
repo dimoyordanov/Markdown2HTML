@@ -23,6 +23,8 @@ data TextInformation =
     | NonOrderedList [TextInformation]
     | OrderedList [TextInformation]
     | Checkbox [TextInformation]
+    | Math String
     | Rule
     | Inline String
+    | InlineBlock String String
     deriving (Show, Eq)

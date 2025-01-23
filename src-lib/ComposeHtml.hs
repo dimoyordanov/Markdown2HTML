@@ -12,7 +12,14 @@ module ComposeHtml(transformHtmlList, transformHtml2) where
 import Types (TextInformation(..))
 
 generatedCss :: String
-generatedCss = "<link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap\" rel=\"stylesheet\"> \
+generatedCss = "\
+\ <script> \
+\  MathJax = { \
+\   tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]} \
+\  }; \
+\  </script> \
+\ <script id=\"MathJax-script\" async src=\"https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js\"></script>\
+\<link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap\" rel=\"stylesheet\"> \
 \ <style> \
 \        body { \
 \            font-family: 'Roboto', sans-serif; \
@@ -115,6 +122,7 @@ transformHtml2 (x : xs) = transformHtml [x] ++ transformHtml2 xs
 transformHtml:: [TextInformation] -> String
 transformHtml [] = ""
 transformHtml [Rule] = "\n<hr>\n"
+transformHtml [Math p] = "$"++p++"$"
 transformHtml [Text l] = l
 transformHtml [Italic t] = "<i>" ++ transformHtml [t] ++ "</i>"
 transformHtml [Bold t] = "<b>" ++ transformHtml [t] ++ "</b>"

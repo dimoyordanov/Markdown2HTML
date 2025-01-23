@@ -6,6 +6,7 @@
 {-# LANGUAGE InstanceSigs #-}
 module Parser where
 import GHC.Base (Alternative(..), Applicative(liftA2))
+import Data.Bits (Bits(xor))
 
 -- Взето от: https://github.com/fmi-fp-lab/fp-lab-2024-25/blob/master/exercises/09/Parser.hs
 -- START
@@ -17,6 +18,35 @@ parse px str =
   case runParser px str of
     [] -> Nothing
     (_, x) : _ -> Just x
+
+try :: Parser a -> Parser a
+try px = MkParser $ \str ->
+    case runParser px str of
+        []         -> []
+        results    -> results
+
+choice2 :: [Parser a] -> Parser a
+choice2 = foldr (<|>) empty
+
+fallback :: Parser a -> Parser a -> Parser a
+fallback px py = MkParser $ \str ->
+    case runParser px str of
+        [] -> runParser py str   -- If `px` fails, try `py` on the same input.
+        res -> res               -- If `px` succeeds, return its result.
+
+between :: Parser open -> Parser close -> Parser a -> Parser a
+between open close content = do
+    _ <- open       -- Parse the opening delimiter
+    x <- content    -- Parse the content
+    _ <- close      -- Parse the closing delimiter
+    return x
+
+manyTill :: Parser a -> Parser end -> Parser [a]
+manyTill p end = go
+  where
+    go = (end >> pure [])       -- Stop parsing if the end parser succeeds.
+         <|>                    -- Otherwise...
+         liftA2 (:) p go        -- Parse an item with `p`, then continue.
 
 instance Functor Parser where
   fmap :: (a -> b) -> Parser a -> Parser b
