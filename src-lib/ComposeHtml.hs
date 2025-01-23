@@ -117,6 +117,12 @@ transformHtml2 res@((Checkbox _): _) = transformHtml (takeWhile func res) ++ tra
                                                 func = \str -> case str of
                                                             (Checkbox _) -> True
                                                             _ -> False
+transformHtml2 res@((InlineBlock _): _) = transformHtml (takeWhile func res) ++ (transformHtml2 $ drop 1 (dropWhile func res))
+                                            where
+                                                func :: TextInformation -> Bool
+                                                func = \str -> case str of
+                                                            (InlineBlock "") -> False
+                                                            _ -> False
 transformHtml2 (x : xs) = transformHtml [x] ++ transformHtml2 xs
 
 transformHtml:: [TextInformation] -> String
@@ -160,4 +166,6 @@ transformHtml res@((Checkbox _): _) =
                     (Checkbox l1) -> "<div>\n<input type=\"checkbox\" id=\"scales\" name=\"scales\">\n<label for=\"scales\">"++concatMap (transformHtml.(:[])) l1 ++ "</label>\n</div>\n"
                     l -> show l
         ) res
+transformHtml res@((InlineBlock _): _) =
+     "<code>" ++ (transformHtml2 $ drop 1 res)  ++ "</code>"
 transformHtml _ = error "error parsing"

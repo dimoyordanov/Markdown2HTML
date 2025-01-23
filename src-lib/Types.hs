@@ -26,5 +26,5 @@ data TextInformation =
     | Math String
     | Rule
     | Inline String
-    | InlineBlock String String
+    | InlineBlock String
     deriving (Show, Eq)

@@ -6,10 +6,11 @@
 {-# OPTIONS_GHC -Werror #-}                        -- turn warnings into errors
 module Main where
 import Parser (parse)
-import ParserMarkdown (parseLine)
-import ComposeHtml (transformHtmlList)
+import ParserMarkdown2 (parseManyMainBlocks)
+import ComposeHTML2 (transformHtmlList)
 import System.IO (openFile, IOMode(..), hGetContents)
 import System.Environment (getArgs)
+import Data.Maybe (fromMaybe)
 
 
 -- I like my text **bold** and *italic* `maybe code`
@@ -21,6 +22,4 @@ main = do
             [] -> getLine >>= (`openFile` ReadMode) 
             (x: _) -> openFile x ReadMode
   linesLister <- hGetContents handle
-  putStrLn $ transformHtmlList $ map (\str -> case parse parseLine str of
-                                                Just x -> x
-                                                Nothing -> error "Failed parsing") $ lines linesLister
+  putStrLn $ transformHtmlList $ fromMaybe [] $ parse parseManyMainBlocks linesLister

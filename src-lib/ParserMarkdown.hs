@@ -33,29 +33,39 @@ matchesString (x: xs) = do
     res <- matchesString xs
     return $ val: res
 
+-- notMatchesString :: String -> Parser String
+-- notMatchesString [] = empty
+-- notMatchesString [x] = do
+--     res <- eatPredicate (/=x)
+--     return [res]
+-- notMatchesString (x: xs) = do
+--     val <- eatPredicate (/=x)
+--     res <- matchesString xs
+--     return $ val: res
+
 string :: Parser String
 string = do
   some $ eatPredicate isLetter <|>
-                eatPredicate (==' ') <|> 
-                eatPredicate (=='/') <|> 
-                eatPredicate (==':') <|> 
+                eatPredicate (==' ') <|>
+                eatPredicate (=='/') <|>
+                eatPredicate (==':') <|>
                 eatPredicate (=='?') <|>
-                eatPredicate (=='&') <|> 
-                eatPredicate (==';') <|> 
-                eatPredicate (=='=') <|> 
-                eatPredicate (=='(') <|> 
+                eatPredicate (=='&') <|>
+                eatPredicate (==';') <|>
+                eatPredicate (=='=') <|>
+                eatPredicate (=='(') <|>
                 eatPredicate (==')') <|>
-                eatPredicate (=='^') <|> 
-                eatPredicate (==',') <|> 
-                eatPredicate (=='+') <|> 
-                eatPredicate (=='>') <|> 
-                eatPredicate (=='<') <|> 
-                eatPredicate (=='|') <|> 
-                eatPredicate (=='\'') <|> 
-                eatPredicate (=='\"') <|> 
-                eatPredicate (=='\\') <|> 
-                eatPredicate (=='.') <|> 
-                eatPredicate (=='-') <|> 
+                eatPredicate (=='^') <|>
+                eatPredicate (==',') <|>
+                eatPredicate (=='+') <|>
+                eatPredicate (=='>') <|>
+                eatPredicate (=='<') <|>
+                eatPredicate (=='|') <|>
+                eatPredicate (=='\'') <|>
+                eatPredicate (=='\"') <|>
+                eatPredicate (=='\\') <|>
+                eatPredicate (=='.') <|>
+                eatPredicate (=='-') <|>
                 eatPredicate isDigit
 
 number :: Parser String
@@ -69,7 +79,7 @@ parserBoldAndItalic = fmap ((Bold).(Italic).Text)  $ (matchesString "***" >> str
 
 
 parserStrikeThrough :: Parser TextInformation
-parserStrikeThrough = fmap ((StrikeThrough).Text)  $ (matchesString "~~" >> string <* matchesString "~~")
+parserStrikeThrough = ((StrikeThrough).Text) <$> (matchesString "~~" >> string <* matchesString "~~")
 
 parserInline :: Parser TextInformation
 parserInline = fmap Inline  $ matchesString "`" >> some (eatPredicate (\x ->(x/='`') && (x/='\n'))) <* matchesString "`"
@@ -104,12 +114,12 @@ parserText = Text <$> string
 
 parseText :: Parser [TextInformation]
 parseText = many $ parserImage <|>
-                   parserLink <|> 
-                   parserBoldAndItalic <|> 
+                   parserLink <|>
+                   parserBoldAndItalic <|>
                    parserStrikeThrough <|>
-                   parserBold <|> 
-                   parserItalic <|> 
-                   parserInline <|> 
+                   parserBold <|>
+                   parserItalic <|>
+                   parserInline <|>
                    parserMathJax <|>
                    parserText
 
@@ -133,12 +143,12 @@ parseBlockquote = fmap Blockquote  $ matchesString "> " >> parseText
 
 parseUnordered :: Parser TextInformation
 parseUnordered = fmap NonOrderedList $ (matchesString "* " >> parseText) <|> (matchesString "+ " >> parseText) <|> (matchesString "- " >> parseText)
-    
+
 parseOrdered :: Parser TextInformation
 parseOrdered = fmap OrderedList $ (number >> matchesString ". " >> parseText) <|> (number >> matchesString ") " >> parseText)
 
 parseCheckBox :: Parser TextInformation
-parseCheckBox = fmap Checkbox $ (matchesString "- [] " >> parseText)
+parseCheckBox = Checkbox <$> (matchesString "- [] " >> parseText)
 
 parseRule :: Parser TextInformation
 parseRule = eatPredicate (=='-') >> eatPredicate (=='-') >> eatPredicate (=='-') >> many (eatPredicate (=='-')) $> Rule
@@ -153,7 +163,5 @@ parseLine = parseRule <|>
   parseBlockquote <|>
   parseCheckBox <|>
   parseUnordered <|>
-  parseOrdered <|> 
-  parserLink <|>
-  parserImage <|>
+  parseOrdered <|>
   fmap Paragraph parseText
