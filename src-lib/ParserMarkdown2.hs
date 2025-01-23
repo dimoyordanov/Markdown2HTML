@@ -197,8 +197,8 @@ parseRule = matchesString "---" >> many (eatSpecific '-') >> pure Rule
 parseInlineBlock :: Parser MainBlocks
 parseInlineBlock = do
     _ <- parserInlineBlock
-    str1 <- some (eatPredicate (not. (`elem` ['\n']))) <* eatPredicate (const True)
-    str2 <- parserStringIsNotIn ["``"]
+    str1 <- many (eatPredicate (not. (`elem` ['\n']))) <* eatPredicate (const True)
+    str2 <- parserStringIsNotIn ["```"]
     _ <- parserInlineBlock
     return (InlineBlock str1 str2)
         where parserInlineBlock = matchesString "```"
