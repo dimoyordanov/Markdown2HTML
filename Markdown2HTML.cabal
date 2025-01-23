@@ -107,7 +107,7 @@ test-suite Markdown2HTML-test
     default-language: Haskell2010
 
     -- Modules included in this executable, other than Main.
-    -- other-modules:
+    other-modules: Test1 Test2
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

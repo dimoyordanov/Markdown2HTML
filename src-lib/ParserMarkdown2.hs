@@ -101,25 +101,24 @@ splitAtFirst sep = go ""
 -- ("13123","11")
 
 parseBoldItalic :: Parser BuilderBlocks
-parseBoldItalic = fmap BoldItalic $
-        between parserBold parserBold (parserStringIsNotIn ["***", "\n"]) <|>
-         between parserBold2 parserBold2 (parserStringIsNotIn ["___", "\n"])
+parseBoldItalic = BoldItalic <$> choice2 [try $ between parserBold parserBold (parserStringIsNotIn ["***", "\n"]),
+               try $ between parserBold2 parserBold2 (parserStringIsNotIn ["___", "\n"])]
             where
                 parserBold = matchesString "***"
                 parserBold2 = matchesString "___"
 
 
 parseBold :: Parser BuilderBlocks
-parseBold = fmap Bold $ between parserBold parserBold $ parserStringIsNotIn ["**", "\n"] <|>
-                        between parserBold2 parserBold2 (parserStringIsNotIn ["__", "\n"])
-            where 
+parseBold = Bold <$> choice2 [try $ between parserBold parserBold $ parserStringIsNotIn ["**", "\n"],
+                        try $ between parserBold2 parserBold2 (parserStringIsNotIn ["__", "\n"])]
+            where
                 parserBold = matchesString "**"
                 parserBold2 = matchesString "__"
 
 parseItalic :: Parser BuilderBlocks
-parseItalic = fmap Italic $ between parserBold parserBold $ parserStringIsNotIn ["*", "\n"] <|>
-                            between parserBold2 parserBold2 (parserStringIsNotIn ["__", "\n"])
-            where 
+parseItalic = Italic <$> choice2 [ try $ between parserBold parserBold $ parserStringIsNotIn ["*", "\n"],
+                                try $ between parserBold2 parserBold2 (parserStringIsNotIn ["_", "\n"])]
+            where
                 parserBold = matchesString "*"
                 parserBold2 = matchesString "_"
 
@@ -162,7 +161,7 @@ parseText :: Parser BuilderBlocks
 parseText = Text <$> some (eatPredicate (not. (`elem` [' ', '\n'])))
 
 parseBuilderBlocks :: Parser [BuilderBlocks]
-parseBuilderBlocks = many $
+parseBuilderBlocks = some $
     fallback (fallback (choice2 [
                                   try parseBoldItalic,
                                   try parseImage,
@@ -207,7 +206,7 @@ parseInlineBlock = do
 
 parseOrderedList :: Parser MainBlocks
 parseOrderedList = p1 '.' <|> p1 ')'
-    where 
+    where
         p1 char = do
                 res1 <- some number >> matchesString (char: " ") >> parseBuilderBlocks
                 res2 <- many $ try (matchesString "\n" >> some number >> matchesString (char: " ") >> parseBuilderBlocks)
@@ -215,7 +214,7 @@ parseOrderedList = p1 '.' <|> p1 ')'
 
 parseUnorderedList :: Parser MainBlocks
 parseUnorderedList =  p1 '*' <|> p1 '-'
-        where 
+        where
             p1 char = do
                     res <- matchesString (char:" ") >> parseBuilderBlocks
                     res2 <- many $ try (matchesString "\n" >> (matchesString (char:" ") >> parseBuilderBlocks))
