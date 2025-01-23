@@ -5,8 +5,7 @@
 {-# OPTIONS_GHC -fwarn-incomplete-uni-patterns #-} -- warn about incomplete patterns v2
 {-# LANGUAGE InstanceSigs #-}
 module Parser where
-import GHC.Base (Alternative(..), Applicative(liftA2))
-import Data.Bits (Bits(xor))
+import GHC.Base (Alternative(..))
 
 -- Взето от: https://github.com/fmi-fp-lab/fp-lab-2024-25/blob/master/exercises/09/Parser.hs
 -- START

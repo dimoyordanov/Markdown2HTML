@@ -86,6 +86,16 @@ transformHtml2 :: [MainBlocks] -> String
 transformHtml2 = foldr (\l r -> transformHtml l ++ ('\n':r)) ""
 
 transformHtml :: MainBlocks -> String
+transformHtml (Header1 []) = ""
+transformHtml (Header2 []) = ""
+transformHtml (Header3 []) = ""
+transformHtml (Header4 []) = ""
+transformHtml (Header5 []) = ""
+transformHtml (OrderedList []) = ""
+transformHtml (UnorderedList []) = ""
+transformHtml (BlockQuote []) = ""
+transformHtml (Paragraph []) = ""
+transformHtml (Checkbox []) = ""
 transformHtml (Header1 b) = "<h1>" ++ transformBuilderBlocks b ++ "</h1>"
 transformHtml (Header2 b) = "<h2>" ++ transformBuilderBlocks b ++ "</h2>"
 transformHtml (Header3 b) = "<h3>" ++ transformBuilderBlocks b ++ "</h3>"
@@ -105,7 +115,7 @@ transformBuilderBlocks = foldr (\l r -> transformBuilderBlock l ++ r) ""
 transformBuilderBlock :: BuilderBlocks -> String
 transformBuilderBlock (Text t) = t
 transformBuilderBlock (Bold t) = "<b>" ++t ++ "</b>"
-transformBuilderBlock (Italic t) = "<b>" ++t ++ "</b>"
+transformBuilderBlock (Italic t) = "<i>" ++t ++ "</i>"
 transformBuilderBlock (BoldItalic t) = "<b><i>" ++t ++ "</i></b>"
 transformBuilderBlock (Strikethrough t) = "<s>" ++t ++ "</s>"
 transformBuilderBlock (InlineCode t) = "<code>" ++t ++ "</code>"

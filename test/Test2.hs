@@ -4,6 +4,7 @@ module Test2 where
 import Test.Hspec
 import Parser (parse)
 import ParserMarkdown2 (parseManyMainBlocks, MainBlocks (..), BuilderBlocks(..))
+import ComposeHTML2 (transformBuilderBlock, transformHtml)
 
 spec :: Spec
 spec = do
@@ -206,3 +207,79 @@ spec = do
             parse parseManyMainBlocks "```\ntin\n```" `shouldBe` Just [InlineBlock "" "tin\n"]
         it "ParseFile parse code 1+2 lines" $ do
             parse parseManyMainBlocks "```baz\ntin\nmin\n```" `shouldBe` Just [InlineBlock "baz" "tin\nmin\n"]
+    describe "compileToHtmlBuilderBlocks" $ do
+        it "Compile text" $ do
+            transformBuilderBlock (Text "1") `shouldBe` "1"
+        it "Compile text empty" $ do
+            transformBuilderBlock (Text " ") `shouldBe` " "
+        it "Compile bold bold" $ do
+            transformBuilderBlock (Bold "1") `shouldBe` "<b>1</b>"
+        it "Compile text italic" $ do
+            transformBuilderBlock (Italic "1") `shouldBe` "<i>1</i>"
+        it "Compile text strikethrough" $ do
+            transformBuilderBlock (Strikethrough "1") `shouldBe` "<s>1</s>"
+        it "Compile text bolditalic" $ do
+            transformBuilderBlock (BoldItalic "1") `shouldBe` "<b><i>1</i></b>"
+        it "Compile text inline code" $ do
+            transformBuilderBlock (InlineCode "1") `shouldBe` "<code>1</code>"
+        it "Compile text inline math" $ do
+            transformBuilderBlock (InlineMath "1") `shouldBe` "$1$"
+        it "Compile text image" $ do
+            transformBuilderBlock (Image "2" "3") `shouldBe` "<img src = \"3\" alt = \"2\"></img>"
+        it "Compile text" $ do
+            transformBuilderBlock (Link "2" "3") `shouldBe` "<a href = \"3\">2</a>"
+    describe "CompileToHtmlMainBlocks" $ do
+        it "Compile paragraph simple" $ do
+            transformHtml (Paragraph [Text "1"]) `shouldBe` "<p>1</p>"
+        it "Compile header1 simple" $ do
+            transformHtml (Header1 [Text "1"]) `shouldBe` "<h1>1</h1>"
+        it "Compile header1 complex" $ do
+            transformHtml (Header1 [Text "1", Bold "3"]) `shouldBe` "<h1>1<b>3</b></h1>"
+        it "Compile header1 empty" $ do
+            transformHtml (Header1 []) `shouldBe` ""
+        it "Compile header2 simple" $ do
+            transformHtml (Header2 [Text "1"]) `shouldBe` "<h2>1</h2>"
+        it "Compile header2 complex" $ do
+            transformHtml (Header2 [Text "1", Bold "3"]) `shouldBe` "<h2>1<b>3</b></h2>"
+        it "Compile header2 empty" $ do
+            transformHtml (Header2 []) `shouldBe` ""
+        it "Compile header3 simple" $ do
+            transformHtml (Header3 [Text "1"]) `shouldBe` "<h3>1</h3>"
+        it "Compile header3 complex" $ do
+            transformHtml (Header3 [Text "1", Bold "3"]) `shouldBe` "<h3>1<b>3</b></h3>"
+        it "Compile header3 empty" $ do
+            transformHtml (Header3 []) `shouldBe` ""
+        it "Compile header4 simple" $ do
+            transformHtml (Header4 [Text "1"]) `shouldBe` "<h4>1</h4>"
+        it "Compile header4 complex" $ do
+            transformHtml (Header4 [Text "1", Bold "3"]) `shouldBe` "<h4>1<b>3</b></h4>"
+        it "Compile header4 empty" $ do
+            transformHtml (Header4 []) `shouldBe` ""
+        it "Compile header5 simple" $ do
+            transformHtml (Header5 [Text "1"]) `shouldBe` "<h5>1</h5>"
+        it "Compile header5 complex" $ do
+            transformHtml (Header5 [Text "1", Bold "3"]) `shouldBe` "<h5>1<b>3</b></h5>"
+        it "Compile header5 empty" $ do
+            transformHtml (Header5 []) `shouldBe` ""
+        it "Compile code block empty" $ do
+            transformHtml (InlineBlock "" "3") `shouldBe` "<code>\n3\n</code>"
+        it "Compile code block 2 string" $ do
+            transformHtml (InlineBlock "baz" "3") `shouldBe` "<code>\n3\n</code>"
+        it "Compile ordered list simple" $ do
+            transformHtml (OrderedList [[Text "123"]]) `shouldBe` "<ol>\n<li>123</li>\n</ol>"
+        it "Compile ordered list empty" $ do
+            transformHtml (OrderedList []) `shouldBe` ""
+        it "Compile ordered list two" $ do
+            transformHtml (OrderedList [[Text "123", Text "34"], [Text "12"]]) `shouldBe` "<ol>\n<li>12334</li>\n<li>12</li>\n</ol>"
+        it "Compile unordered list simple" $ do
+            transformHtml (UnorderedList [[Text "123"]]) `shouldBe` "<ul>\n<li>123</li>\n</ul>"
+        it "Compile unordered list empty" $ do
+            transformHtml (UnorderedList []) `shouldBe` ""
+        it "Compile unordered list two" $ do
+            transformHtml (UnorderedList [[Text "123", Text "34"], [Text "12"]]) `shouldBe` "<ul>\n<li>12334</li>\n<li>12</li>\n</ul>"
+        it "Compile blockqoute list simple" $ do
+            transformHtml (BlockQuote [[Text "123"]]) `shouldBe` "<blockquote>\n123\n</blockquote>"
+        it "Compile blockqoute list empty" $ do
+            transformHtml (BlockQuote []) `shouldBe` ""
+        it "Compile blockqoute list two" $ do
+            transformHtml (BlockQuote [[Text "123", Text "34"], [Text "12"]]) `shouldBe` "<blockquote>\n12334\n12\n</blockquote>"
